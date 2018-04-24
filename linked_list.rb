@@ -1,8 +1,13 @@
 require_relative 'node'
 
 class LinkedList
+  attr_accessor :head
+
   def initialize
     @head = nil
+    append(400, 300)
+    append(380, 300)
+    append(360, 300)
   end
  
   def append(x_value, y_value)
@@ -41,4 +46,5 @@ class LinkedList
   		@head.x_value -= 10
   	end
   end
+
 end
