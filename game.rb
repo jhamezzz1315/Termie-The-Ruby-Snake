@@ -12,9 +12,9 @@ class GameWindow < Gosu::Window
   FOOD_COLOR = 0xff_ffff00
   RECT_SIZE = 20
 
-	def initialize(width=800, height=600, fullscreen=false, update_interval = 50 )
+	def initialize(width=800, height=600, fullscreen=false, update_interval = 100 )
     super
-    self.caption = 'Hello Movement'
+    self.caption = 'TERMIE THE RUBY SNAKE'
     @linkedList = LinkedList.new
    	@left_direction = false
    	@right_direction = true
@@ -24,8 +24,15 @@ class GameWindow < Gosu::Window
     @right_direction_paused = false
     @up_direction_paused = false
     @down_direction_paused =false
+    @food_x_value = 0
+    @food_y_value = 0
     @paused = false
     @buttons_down = 0
+    @level = 1
+    @score = 0
+    @font = Gosu::Font.new(20)
+
+    place_of_food
   end
 
   def update
@@ -99,8 +106,32 @@ class GameWindow < Gosu::Window
 
     if node.x_value < LEFT_SIDE_BOUND or node.x_value >= RIGHT_SIDE_BOUND or 
       node.y_value <= UPPER_BOUND or node.y_value >= LOWER_BOUND
-      close
+        close
+    elsif (node.x_value >= @food_x_value and node.x_value <= @food_x_value + RECT_SIZE) 
+      if node.y_value >= @food_y_value and node.y_value <= @food_y_value + RECT_SIZE
+          @score += 1
+
+          if (@score / 10) == @level
+            @level += 1
+            self.update_interval -= 10  
+          end
+          
+          @linkedList.append_last(@up_direction, @down_direction, @right_direction, @left_direction)
+          place_of_food 
+      end
     end
+
+  end
+
+  def place_of_food
+    @food_x_value = LEFT_SIDE_BOUND + rand(RIGHT_SIDE_BOUND - LEFT_SIDE_BOUND - RECT_SIZE)
+    @food_y_value = UPPER_BOUND + RECT_SIZE + rand(LOWER_BOUND - UPPER_BOUND - (2*RECT_SIZE))
+
+    temp = @food_x_value % 10
+    @food_x_value -= temp
+    temp = @food_y_value % 10
+    @food_y_value -= temp
+
   end
 
   def draw
@@ -123,7 +154,7 @@ class GameWindow < Gosu::Window
     end
 
     while x >= LEFT_SIDE_BOUND do
-      self.draw_rect(x, y, RECT_SIZE, RECT_SIZE, BORDER_COLOR, 1, :default)
+      self.draw_rect(x, y, RECT_SIZE, RECT_SIZE, BORDER_COLOR, 1, :additive)
       x -= RECT_SIZE
     end
 
@@ -133,6 +164,12 @@ class GameWindow < Gosu::Window
       self.draw_rect(node.x_value, node.y_value, RECT_SIZE, RECT_SIZE, SNAKE_COLOR, 1, :default)
       node = node.next
     end
+
+    self.draw_rect(@food_x_value, @food_y_value, RECT_SIZE, RECT_SIZE, FOOD_COLOR, 1, :default)
+
+    @font.draw("[q] quit [space] pause",0,0, 1)
+    @font.draw("TERMIE THE RUBY SNAKE", 300, 0, 1, 1, 1,0xff_00ff00)
+    @font.draw("Level: #{@level} Score: #{@score}", 600, 0, 1, 1, 1, 0xff_00ffff)
 
   end
 end
