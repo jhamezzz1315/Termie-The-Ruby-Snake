@@ -16,6 +16,9 @@ class GameWindow < Gosu::Window
     super
     self.caption = 'TERMIE THE RUBY SNAKE'
     @linkedList = LinkedList.new
+
+    create_list
+
    	@left_direction = false
    	@right_direction = true
    	@up_direction = false
@@ -35,8 +38,30 @@ class GameWindow < Gosu::Window
     place_of_food
   end
 
+  #initialize nodes of out current linked list
+  def create_list
+    @linkedList.append(400, 300)
+    @linkedList.append(380, 300)
+    @linkedList.append(360, 300)
+  end
+
+  #method use to copy the current linked list node into a new one in order to be used for updating
+  def create_new_list
+    temp_linkedList = LinkedList.new
+    node = @linkedList.head
+
+    while node
+      temp_linkedList.append(node.x_value, node.y_value)
+      node = node.next
+    end
+
+    return temp_linkedList
+  end
+
+
   def update
-   	@linkedList.update_list(@up_direction, @down_direction, @right_direction, @left_direction)
+    temp_linkedList = create_new_list
+   	@linkedList.update_list(@up_direction, @down_direction, @right_direction, @left_direction, temp_linkedList)
     check_collision
  	end
 
@@ -97,6 +122,7 @@ class GameWindow < Gosu::Window
 	 @buttons_down -= 1
   end
 
+  #overriding needs_redraw? in order to force the window to update
 	def needs_redraw?
     @buttons_down > 0 || @down_direction || @up_direction || @left_direction || @right_direction
   end
@@ -105,19 +131,21 @@ class GameWindow < Gosu::Window
     node = @linkedList.head
 
     if node.x_value < LEFT_SIDE_BOUND or node.x_value >= RIGHT_SIDE_BOUND or 
-      node.y_value <= UPPER_BOUND or node.y_value >= LOWER_BOUND
+      node.y_value <= UPPER_BOUND or node.y_value >= LOWER_BOUND or @linkedList.collide
+        game_over
         close
     elsif (node.x_value >= @food_x_value and node.x_value <= @food_x_value + RECT_SIZE) 
-      if node.y_value >= @food_y_value and node.y_value <= @food_y_value + RECT_SIZE
-          @score += 1
+      if (node.y_value >= @food_y_value and node.y_value <= @food_y_value + RECT_SIZE) or 
+          (node.y_value + RECT_SIZE >= @food_y_value and node.y_value <= @food_y_value + RECT_SIZE)
+            @score += 1
 
-          if (@score / 10) == @level
-            @level += 1
-            self.update_interval -= 10  
-          end
+            if (@score / 10) == @level
+              @level += 1
+              self.update_interval -= 10  
+            end
           
-          @linkedList.append_last(@up_direction, @down_direction, @right_direction, @left_direction)
-          place_of_food 
+            @linkedList.append_last(@up_direction, @down_direction, @right_direction, @left_direction)
+            place_of_food 
       end
     end
 
@@ -131,7 +159,12 @@ class GameWindow < Gosu::Window
     @food_x_value -= temp
     temp = @food_y_value % 10
     @food_y_value -= temp
+  end
 
+  def game_over
+    puts "Game Over"
+    puts "Level reached before game over is #{@level}"
+    puts "Score achieved before game over is #{@score}"
   end
 
   def draw
