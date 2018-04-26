@@ -20,13 +20,13 @@ class LinkedList
     node = find_tail
 
     if up_direction
-      append(node.x_value, node.y_value + 20)
+      append(node.x_value, node.y_value + 1)
     elsif down_direction
-      append(node.x_value, node.y_value - 20)
+      append(node.x_value, node.y_value - 1)
     elsif right_direction
-      append(node.x_value - 20, node.y_value)
+      append(node.x_value - 1, node.y_value)
     elsif left_direction
-      append(node.x_value + 20, node.y_value)
+      append(node.x_value + 1, node.y_value)
     end
     
   end
@@ -51,13 +51,13 @@ class LinkedList
     end
 
     if up_direction
-      @head.y_value -= 20
+      @head.y_value -= 1
     elsif down_direction
-      @head.y_value += 20
+      @head.y_value += 1
     elsif right_direction
-      @head.x_value += 20
+      @head.x_value += 1
     elsif left_direction
-      @head.x_value -= 20
+      @head.x_value -= 1
     end
   	
   end
@@ -73,5 +73,13 @@ class LinkedList
     false
   end
 
-end
+  def print
+    node = @head
+    puts node
+ 
+    while (node = node.next)
+      puts node
+    end
+  end
 
+end

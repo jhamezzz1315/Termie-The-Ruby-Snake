@@ -12,7 +12,7 @@ class GameWindow < Gosu::Window
   FOOD_COLOR = 0xff_ffff00
   RECT_SIZE = 20
 
-	def initialize(width=800, height=600, fullscreen=false, update_interval = 100 )
+	def initialize(width=800, height=600, fullscreen=false, update_interval = 50 )
     super
     self.caption = 'TERMIE THE RUBY SNAKE'
     @linkedList = LinkedList.new
